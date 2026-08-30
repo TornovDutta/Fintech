@@ -23,3 +23,8 @@ Start-Process -FilePath ".\mvnw.cmd" -ArgumentList "spring-boot:run" -WorkingDir
 Write-Host "All services have been launched in separate windows!" -ForegroundColor Cyan
 Write-Host "You can access the gateway at: http://localhost:8080" -ForegroundColor Yellow
 Write-Host "You can view the Eureka Dashboard at: http://localhost:8761" -ForegroundColor Yellow
+Write-Host "You can view Swagger UI for each service at:" -ForegroundColor Yellow
+Write-Host "- API Gateway: http://localhost:8080/swagger-ui.html" -ForegroundColor Yellow
+Write-Host "- Account Service: http://localhost:8082/swagger-ui/index.html" -ForegroundColor Yellow
+Write-Host "- Transaction Service: http://localhost:8083/swagger-ui/index.html" -ForegroundColor Yellow
+Write-Host "- Auth Service: http://localhost:8081/swagger-ui/index.html" -ForegroundColor Yellow
