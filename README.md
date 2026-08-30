@@ -1,100 +1,130 @@
-# Fintech API
+# Fintech Microservices Ecosystem
 
-A RESTful Fintech Application built with Java, Spring Boot, and MongoDB. This application allows users to create bank accounts, check balances, and securely transfer funds between accounts.
+A robust, RESTful financial technology platform built on a microservices architecture using Java, Spring Boot, Spring Cloud, and MongoDB. This system provides secure user authentication, account management, and reliable fund transfer capabilities.
 
-## Tech Stack
+## Architecture Overview
 
-- **Java 17**
-- **Spring Boot** (v4.1.1)
-- **MongoDB** (Spring Data MongoDB)
-- **Lombok**
-- **Springdoc OpenAPI** (Swagger UI)
-- **Maven**
+The system is decomposed into specialized, loosely-coupled microservices that communicate securely and register with a central discovery server:
 
-## Features
+- **Discovery Server (Port 8761):** Netflix Eureka server acting as the service registry. All microservices register here to enable dynamic service discovery.
+- **API Gateway (Port 8080):** Spring Cloud Gateway serving as the single entry point for the ecosystem. It routes external requests to the appropriate internal microservices and provides centralized routing.
+- **Auth Service (Port 8081):** Manages user registration, authentication, and JWT (JSON Web Token) generation.
+- **Account Service (Port 8082):** Handles core banking operations including account creation, balance inquiries, and account lifecycle management.
+- **Transaction Service (Port 8083):** Manages secure fund transfers between accounts and maintains transaction history. Uses OpenFeign for inter-service communication with the Account Service.
 
-- **Account Management**: Create accounts and retrieve account details/balances.
-- **Transactions**: Transfer money between different accounts safely.
-- **Validation**: Input validation for account creation and money transfers.
-- **API Documentation**: Auto-generated Swagger documentation.
+## Technology Stack
+
+- **Java 17+**
+- **Spring Boot 3.2.x**
+- **Spring Cloud 2023.0.x** (Eureka, Gateway, OpenFeign)
+- **Spring Security & JWT** (Authentication and Authorization)
+- **MongoDB** (NoSQL Database via Spring Data MongoDB)
+- **Lombok** (Boilerplate reduction)
+- **Springdoc OpenAPI 2.4.0** (Swagger UI documentation)
+- **Maven** (Dependency management and build tool)
 
 ## Prerequisites
 
-- Java 17 or higher
-- Maven (included via Maven Wrapper)
-- MongoDB (running locally or accessible via URI)
+Ensure the following tools are installed in your environment before proceeding:
 
-## Getting Started
+- Java Development Kit (JDK) 17 or higher
+- MongoDB (running locally on default port 27017 or accessible via remote URI)
+- Maven (optional, as the Maven Wrapper is included in the project)
 
-### 1. Configure the Environment
+## Environment Configuration
 
-The application configuration relies on a `.env` file located in the project root. Ensure it has the correct MongoDB URI and Server Port:
+Global configurations can be defined via the `.env` file located in the project root. Ensure the MongoDB URI and Server Port properties are accurately defined:
 
 ```env
 MONGO_URI=mongodb://localhost:27017/fintechdb
 SERVER_PORT=8080
 ```
 
-### 2. Build and Run
+*Note: Individual microservices maintain their specific port configurations within their respective `application.properties` files.*
 
-You can run the application using the included Maven wrapper:
+## Building and Running the System
 
-**On Linux/macOS:**
+### 1. Build the Project
+
+To compile the source code and download all dependencies, run the following command from the project root:
+
+**Windows:**
+```cmd
+.\mvnw.cmd clean install
+```
+
+**Linux / macOS:**
 ```bash
 ./mvnw clean install
-./mvnw spring-boot:run
 ```
 
-**On Windows:**
+### 2. Start the Microservices
+
+You can start the entire ecosystem sequentially using the provided automated scripts. These scripts launch the Discovery Server first, wait for initialization, and subsequently launch the API Gateway and backend services in distinct terminal instances.
+
+**Windows Batch Script (Recommended for Windows):**
 ```cmd
-mvnw.cmd clean install
-mvnw.cmd spring-boot:run
+start_all.bat
 ```
 
-The server will start on `http://localhost:8080` (or the port specified in your `.env` file).
+**PowerShell Script:**
+```powershell
+.\start_all.ps1
+```
 
-## API Endpoints
+*Alternatively, services can be run manually using `mvn spring-boot:run` within each respective subdirectory.*
 
-Once the application is running, you can access the Swagger UI for interactive API documentation at:
-`http://localhost:8080/swagger-ui.html`
+## API Documentation and Access
 
-### Accounts
+Once the ecosystem is fully initialized, services can be interacted with via the API Gateway or documented directly through their respective Swagger UI endpoints.
 
-- `POST /api/accounts`
-  - Create a new account.
-  - **Body Payload:**
-    ```json
-    {
-      "customerName": "John Doe",
-      "currency": "USD",
-      "initialBalance": 1000.00
-    }
-    ```
-- `GET /api/accounts`
-  - Retrieve a list of all accounts.
-- `GET /api/accounts/{id}`
-  - Retrieve details for a specific account.
+- **API Gateway Access:** `http://localhost:8080`
+- **Eureka Service Dashboard:** `http://localhost:8761`
 
-### Transactions
+### Swagger UI Endpoints
 
-- `POST /api/transactions/transfer`
-  - Transfer funds from one account to another.
-  - **Body Payload:**
-    ```json
-    {
-      "sourceAccountId": "64d...", 
-      "destinationAccountId": "64e...",
-      "amount": 150.50
-    }
-    ```
-- `GET /api/transactions/account/{accountId}`
-  - Retrieve all transactions (credits and debits) for a specific account.
+Each microservice generates its own OpenAPI documentation:
+
+- **API Gateway:** `http://localhost:8080/swagger-ui.html`
+- **Auth Service:** `http://localhost:8081/swagger-ui/index.html`
+- **Account Service:** `http://localhost:8082/swagger-ui/index.html`
+- **Transaction Service:** `http://localhost:8083/swagger-ui/index.html`
+
+## Core API Routes
+
+Requests should primarily be routed through the API Gateway (`http://localhost:8080`), which maps paths as follows:
+
+- `/api/auth/**` -> Auth Service
+- `/api/accounts/**` -> Account Service
+- `/api/transactions/**` -> Transaction Service
+
+### Example Payloads
+
+**Create Account (Account Service):**
+```json
+{
+  "customerName": "John Doe",
+  "currency": "USD",
+  "initialBalance": 1000.00
+}
+```
+
+**Transfer Funds (Transaction Service):**
+```json
+{
+  "sourceAccountId": "account_id_1", 
+  "destinationAccountId": "account_id_2",
+  "amount": 150.50
+}
+```
 
 ## Project Structure
 
-- `controller`: Contains the REST API endpoints (`AccountController`, `TransactionController`).
-- `service`: Business logic for accounts and transactions.
-- `model`: MongoDB document entities (`Account`, `Transaction`).
-- `repository`: Spring Data MongoDB repositories.
-- `dto`: Data Transfer Objects for API requests (`AccountRequest`, `TransferRequest`).
-- `config`: Application configuration (e.g., `SwaggerConfig`).
+The repository is structured as a Maven multi-module project:
+
+- `fintech-microservices` (Root Project)
+  - `discovery-server`: Service registry module.
+  - `api-gateway`: Edge gateway and routing module.
+  - `auth-service`: Security and identity module.
+  - `account-service`: Core account management module.
+  - `transaction-service`: Transaction and transfer module.
