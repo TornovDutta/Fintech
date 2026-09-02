@@ -33,14 +33,12 @@ Ensure the following tools are installed in your environment before proceeding:
 
 ## Environment Configuration
 
-Global configurations can be defined via the `.env` file located in the project root. Ensure the MongoDB URI and Server Port properties are accurately defined:
+Each microservice maintains its own `.env` file in its respective directory. Ensure the MongoDB URI and Server Port properties are accurately defined for each service. For example, in `account-service/.env`:
 
 ```env
-MONGO_URI=mongodb://localhost:27017/fintechdb
-SERVER_PORT=8080
+MONGO_URI=mongodb://localhost:27017/account_db
+SERVER_PORT=8082
 ```
-
-*Note: Individual microservices maintain their specific port configurations within their respective `application.properties` files.*
 
 ## Building and Running the System
 
