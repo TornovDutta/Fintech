@@ -15,7 +15,12 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    public static final String SECRET = "MAjAVLT/ZkGfsOrCbTLY8dmht68tLa6ebyEh40ywmUWsJr6aaOL+H/WX6AC+Zj8LTedMQA0lLwWvK6wTu6LfbA==";
+
+    private Key getSignKey() {
+        byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(SECRET);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
@@ -31,7 +36,7 @@ public class JwtTokenProvider {
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(key)
+                .signWith(getSignKey())
                 .compact();
     }
 }
