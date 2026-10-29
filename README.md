@@ -19,6 +19,7 @@ The system is decomposed into specialized, loosely-coupled microservices that co
 - **Spring Cloud 2023.0.x** (Eureka, Gateway, OpenFeign)
 - **Spring Security & JWT** (Authentication and Authorization)
 - **MongoDB** (NoSQL Database via Spring Data MongoDB)
+- **Docker & Docker Compose** (Containerization & Local/Cloud Orchestration)
 - **Lombok** (Boilerplate reduction)
 - **Springdoc OpenAPI 2.4.0** (Swagger UI documentation)
 - **Maven** (Dependency management and build tool)
@@ -27,40 +28,49 @@ The system is decomposed into specialized, loosely-coupled microservices that co
 
 Ensure the following tools are installed in your environment before proceeding:
 
-- Java Development Kit (JDK) 17 or higher
-- MongoDB (running locally on default port 27017 or accessible via remote URI)
+- Java Development Kit (JDK) 17 or higher (or Docker)
+- Docker & Docker Compose (Recommended) or MongoDB running locally
 - Maven (optional, as the Maven Wrapper is included in the project)
 
-## Environment Configuration
+## Running with Docker Compose (Recommended for AWS & Local Dev)
 
-Each microservice maintains its own `.env` file in its respective directory. Ensure the MongoDB URI and Server Port properties are accurately defined for each service. For example, in `account-service/.env`:
+The easiest way to start all 5 microservices alongside a MongoDB database is using Docker Compose:
 
-```env
-MONGO_URI=mongodb://localhost:27017/account_db
-SERVER_PORT=8082
+```bash
+docker-compose up --build -d
 ```
 
-## Building and Running the System
+To stop all services and keep data:
+```bash
+docker-compose down
+```
+
+To view logs:
+```bash
+docker-compose logs -f
+```
+
+## Running Manually
 
 ### 1. Build the Project
 
-To compile the source code and download all dependencies, run the following command from the project root:
+To compile the source code and download all dependencies, run:
 
 **Windows:**
 ```cmd
-.\mvnw.cmd clean install
+.\mvnw.cmd clean package -DskipTests
 ```
 
 **Linux / macOS:**
 ```bash
-./mvnw clean install
+./mvnw clean package -DskipTests
 ```
 
 ### 2. Start the Microservices
 
-You can start the entire ecosystem sequentially using the provided automated scripts. These scripts launch the Discovery Server first, wait for initialization, and subsequently launch the API Gateway and backend services in distinct terminal instances.
+You can start the entire ecosystem sequentially using the provided automated scripts:
 
-**Windows Batch Script (Recommended for Windows):**
+**Windows Batch Script:**
 ```cmd
 start_all.bat
 ```
